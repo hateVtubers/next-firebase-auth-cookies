@@ -61,6 +61,7 @@ typings/
 # next.js build output
 .next
 
-
-.idea
 package-lock.json
+
+# npm ignore
+.npmignore
