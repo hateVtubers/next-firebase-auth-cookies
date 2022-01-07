@@ -1,4 +1,9 @@
-import type { Provider } from "./types";
+import type {
+  FacebookAuthProvider,
+  GithubAuthProvider,
+  GoogleAuthProvider,
+  TwitterAuthProvider,
+} from "firebase/auth";
 import { Auth, signOut, UserInfo } from "firebase/auth";
 import { signInWithPopup } from "firebase/auth";
 import {
@@ -16,6 +21,12 @@ export type User = {
   providerData: UserInfo[];
   uid: string;
 };
+
+type Provider =
+  | GithubAuthProvider
+  | GoogleAuthProvider
+  | FacebookAuthProvider
+  | TwitterAuthProvider;
 
 export const loginWith = (auth: Auth, provider: Provider): void => {
   signInWithPopup(auth, provider)

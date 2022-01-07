@@ -1,12 +1,15 @@
 {
   "name": "next-firebase-auth-cookies",
-  "version": "1.1.0",
+  "version": "1.2.6",
   "description": "firebase auth based in cookies",
-  "main": "src/index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/**"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "prepare": "npm run build"
+    "build": "tsc"
   },
   "repository": {},
   "keywords": [

@@ -62,6 +62,3 @@ typings/
 .next
 
 package-lock.json
-
-# npm ignore
-.npmignore
