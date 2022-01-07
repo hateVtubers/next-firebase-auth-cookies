@@ -1,20 +1,38 @@
 {
-  "name": "next-firebase-cookies",
+  "name": "next-firebase-auth-cookies",
   "version": "1.0.0",
-  "description": "a small login with firebase based in cookies",
-  "main": "index.js",
+  "description": "firebase auth based in cookies",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {},
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "js",
+    "cookies",
+    "cookie",
+    "next",
+    "nextjs",
+    "auth",
+    "firebase",
+    "firebase-auth"
+  ],
+  "author": {
+    "name": "hateVtubers"
+  },
   "license": "ISC",
+  "homepage": "",
   "dependencies": {
     "cookies-next": "^2.0.3",
     "firebase": "^9.6.1"
   },
   "devDependencies": {
     "typescript": "^4.5.4"
+  },
+  "peerDependencies": {
+    "firebase": "^9.6.1",
+    "next": "12.0.7",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
   }
 }
