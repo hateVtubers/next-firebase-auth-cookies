@@ -13,5 +13,8 @@
   "dependencies": {
     "cookies-next": "^2.0.3",
     "firebase": "^9.6.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.5.4"
   }
 }
