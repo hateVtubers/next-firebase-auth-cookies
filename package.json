@@ -4,7 +4,8 @@
   "description": "firebase auth based in cookies",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "repository": {},
   "keywords": [
