@@ -158,4 +158,6 @@ export default Demo;
 
 ## example
 
-view an [example](https://github.com/hateVtubers/demo)
+### view an example
+- [github repositoryo](https://github.com/hateVtubers/demo)
+- [website](https://demo-jade-xi.vercel.app/)
