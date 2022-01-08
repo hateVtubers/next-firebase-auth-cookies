@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-npm i firebase-auth-with-cookies
+npm i next-firebase-auth-cookies
 ```
 
 ## Configuration
