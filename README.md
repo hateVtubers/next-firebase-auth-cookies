@@ -37,7 +37,7 @@ const Demo = () => {
 export default Demo;
 ```
 
-now create a endpoint `pages/api/auth/login` or `pages/api/auth/[...auth]`, this endpoint will return a cookie value.
+now create an endpoint `pages/api/auth/login` or `pages/api/auth/[...auth]`, this endpoint will return a cookie value.
 ```ts
 // /pages/api/login
 import { getAuthCookieApi } from "firebase-auth-with-cookies";
@@ -65,7 +65,7 @@ type User = { // this is when user is logged
 };
 ```
 
-Now we need a observer to listen the `login` of the user, I recommend to use `useSWR` to listen the `login` event.
+Now we need an observer to listen the `login` of the user, I recommend to use `useSWR` to listen the `login` event.
 ```bash
 npm i swr
 ```
@@ -157,5 +157,3 @@ export default Demo;
 ```
 
 an example in progress...
-
-<small>sorry my english is so bad sorry</small>
