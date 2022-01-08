@@ -156,4 +156,6 @@ export const getServerSideProps = ({ req, res }) => {
 export default Demo;
 ```
 
-an example in progress...
+## example
+
+view an [example](https://github.com/hateVtubers/demo)
