@@ -61,7 +61,7 @@ export default handler;
 
 `getAuthCookieApi` and `getAuthCookieApi`, receive as three parameters: `error`, this parameter is the response of the endpoint when user is not `login`.
 
-```json
+```js
 {
   "message": "Unauthorized"; // this is the default response, when cookie not exist
 }
@@ -80,7 +80,7 @@ type User = { // this is value from cookie
 };
 ```
 
-Now we need an observer to listen the `login` of the user, I recommend to use `useSWR` to listen the `signIn` adn `signOut` events.
+Now we need an observer to listen the `login` of the user, I recommend to use `useSWR` to listen the `signIn` and `signOut` events.
 
 ```bash
 npm i swr
