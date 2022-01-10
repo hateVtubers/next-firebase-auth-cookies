@@ -1,6 +1,6 @@
 {
   "name": "next-firebase-auth-cookies",
-  "version": "1.2.6",
+  "version": "2.0.0",
   "description": "firebase auth based in cookies",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -11,7 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
   },
-  "repository": {},
+  "repository": "@github.com:hateVtubers/next-firebase-auth-cookies.git",
   "keywords": [
     "js",
     "cookies",
@@ -27,7 +27,7 @@
     "email": "rushia0is0so0cute@gmail.com"
   },
   "license": "ISC",
-  "homepage": "",
+  "homepage": "https://github.com/hateVtubers/next-firebase-auth-cookies#readme",
   "dependencies": {
     "cookies-next": "^2.0.3",
     "firebase": "^9.6.1"
@@ -37,8 +37,7 @@
   },
   "peerDependencies": {
     "firebase": "^9.6.1",
-    "next": "12.0.7",
-    "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   }
 }

@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-npm i firebase-auth-with-cookies
+npm i next-firebase-auth-cookies
 ```
 
 ## Configuration
@@ -22,7 +22,6 @@ create a page `demo`.
 ```tsx
 // /page/demo
 import { loginWith, logout } from "firebase-auth-with-cookies";
-
 const Demo = () => {
   return (
     <div>
@@ -33,19 +32,16 @@ const Demo = () => {
     </div>
   );
 };
-
 export default Demo;
 ```
 
-now create a endpoint `pages/api/auth/login` or `pages/api/auth/[...auth]`, this endpoint will return a cookie value.
+now create an endpoint `pages/api/auth/login` or `pages/api/auth/[...auth]`, this endpoint will return a cookie value.
 ```ts
 // /pages/api/login
 import { getAuthCookieApi } from "firebase-auth-with-cookies";
-
 const login = (req, res) => {
   getAuthCookieApi(req, res, { user: null }); // third is optional
 }
-
 export default handler
 ```
 
@@ -65,7 +61,7 @@ type User = { // this is when user is logged
 };
 ```
 
-Now we need a observer to listen the `login` of the user, I recommend to use `useSWR` to listen the `login` event.
+Now we need an observer to listen the `login` of the user, I recommend to use `useSWR` to listen the `login` event.
 ```bash
 npm i swr
 ```
@@ -73,15 +69,11 @@ npm i swr
 ```jsx
 // /page/demo
 import { loginWith, logout } from "firebase-auth-with-cookies";
-
 const fetcher = (...args) => fetch(...args).then(res => res.json())
-
 const Demo = () => {
   const { data, error } = useSWR("/api/auth/login", fetcher)
-
   if (error) return <div>failed to load</div>
   if (!data) return <div>loading...</div>
-
   return (
     <div>
       <h1>{data ? "you're not loged please loged" : `you're loged as ${data?.displayName}`}</h1>
@@ -92,7 +84,6 @@ const Demo = () => {
     </div>
   );
 };
-
 export default Demo;
 ```
 if use typescript you can use `User` as `data` type
@@ -100,15 +91,11 @@ if use typescript you can use `User` as `data` type
 // /page/demo
 /* import type { User } from "firebase-auth-with-cookies";*/
 import { loginWith, logout, User } from "firebase-auth-with-cookies";
-
 const fetcher = (...args) => fetch(...args).then(res => res.json())
-
 const Demo = () => {
   const { data, error } = useSWR<User>("/api/auth/login", fetcher)
-
   if (error) return <div>failed to load</div>
   if (!data) return <div>loading...</div>
-
   return (
     <div>
       <h1>{data ? "you're not loged please loged" : `you're loged as ${data?.displayName}`}</h1>
@@ -119,7 +106,6 @@ const Demo = () => {
     </div>
   );
 };
-
 export default Demo;
 ```
 
@@ -127,12 +113,9 @@ you too can use `getServerSideProps` with `getAuthCookieProps` to get the cookie
 ```js
 // /page/demo
 import { loginWith, logout, getAuthCookieProps } from "firebase-auth-with-cookies";
-
 const fetcher = (...args) => fetch(...args).then(res => res.json())
-
 const Demo = ({ cookie }) => {
   const { data, error } = useSWR("/api/auth/login", fetcher)
-
   return (
     <div>
       <h1>{data ?? cookie?.displayName ? "you're not loged please loged" : `you're loged as ${data?.displayName}`}</h1>
@@ -143,7 +126,6 @@ const Demo = ({ cookie }) => {
     </div>
   );
 };
-
 export const getServerSideProps = ({ req, res }) => {
   const cookie = getAuthCookieProps(req, res, { user: "not logged or error uwu" }); // too resive the parameterm, with user not logged
   return {
@@ -152,8 +134,9 @@ export const getServerSideProps = ({ req, res }) => {
     }
   };
 }
-
 export default Demo;
 ```
-
-an example in progress...
+## example
+### view an example
+- [github repository](https://github.com/hateVtubers/demo)
+- [website](https://demo-jade-xi.vercel.app/)
