@@ -1,8 +1,8 @@
 import {
   Auth,
   signOut as logout,
+  User,
   UserCredential,
-  UserInfo,
 } from "firebase/auth";
 import {
   setCookies,
@@ -10,72 +10,32 @@ import {
   checkCookies,
   getCookie,
 } from "cookies-next";
+import { Auth as AuthServer, DecodedIdToken } from "firebase-admin/auth";
 
-export type User = {
-  displayName: string | null;
-  emailVerified: boolean;
-  isAnonymous: boolean;
-  photoURL: string | null;
-  providerData: UserInfo[];
-  uid: string;
-};
+const token = process.env.NEXT_PUBLIC_FOREBASE_TOKEN as string;
 
-export const signIn = ({
-  user: {
-    displayName,
-    emailVerified,
-    isAnonymous,
-    photoURL,
-    providerData,
-    uid,
-  },
-}: UserCredential): void => {
-  setCookies(process.env.NEXT_PUBLIC_COOKIE_NAME as string, {
-    displayName,
-    emailVerified,
-    isAnonymous,
-    photoURL,
-    providerData,
-    uid,
-  });
+export const signIn = ({ user }: UserCredential): User => {
+  setCookies(token, user.getIdToken());
+  return user;
 };
 
 export const signOut = (auth: Auth): void => {
   logout(auth);
-  removeCookies(process.env.NEXT_PUBLIC_COOKIE_NAME as string);
+  removeCookies(token);
 };
 
-export const getAuthCookieApi = (
-  { req, res }: { req: any; res: any },
-  apiResponse?: object
-) => {
-  if (
-    checkCookies(process.env.NEXT_PUBLIC_COOKIE_NAME as string, { req, res })
-  ) {
-    res
-      .status(200)
-      .json(
-        getCookie(process.env.NEXT_PUBLIC_COOKIE_NAME as string, { req, res })
-      );
-  } else {
-    res.status(200).json(apiResponse ?? { message: "Unauthorized" });
-  }
-};
+export const getSessionUser = async (
+  auth: AuthServer,
+  { req, res }: { req: any; res: any }
+): Promise<DecodedIdToken | null | undefined> => {
+  if (!checkCookies(token, { req, res })) return;
 
-export const getAuthCookieProps = (
-  { req, res }: { req: any; res: any },
-  apiResponse?: object
-) => {
-  if (
-    checkCookies(process.env.NEXT_PUBLIC_COOKIE_NAME as string, { req, res })
-  ) {
-    return JSON.parse(
-      getCookie(process.env.NEXT_PUBLIC_COOKIE_NAME as string, {
-        req,
-        res,
-      }) as string
-    );
-  } else {
-    return apiResponse ?? { message: "Unauthorized" };
-  }
+  const cookie = getCookie(token, { req, res }) as string;
+
+  const user = await auth
+    .verifyIdToken(cookie)
+    .then((value) => value)
+    .catch(() => null);
+
+  return user;
 };
