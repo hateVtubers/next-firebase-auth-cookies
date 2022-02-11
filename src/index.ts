@@ -1,9 +1,4 @@
-import {
-  Auth,
-  signOut as logout,
-  User,
-  UserCredential,
-} from "firebase/auth";
+import { Auth, signOut as logout, User, UserCredential } from "firebase/auth";
 import {
   setCookies,
   removeCookies,
@@ -12,25 +7,35 @@ import {
 } from "cookies-next";
 import { Auth as AuthServer, DecodedIdToken } from "firebase-admin/auth";
 
-const token = process.env.NEXT_PUBLIC_FOREBASE_TOKEN as string;
-
 export const signIn = ({ user }: UserCredential): User => {
-  setCookies(token, user.getIdToken());
+  setCookies(
+    process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string,
+    user.getIdToken()
+  );
   return user;
 };
 
 export const signOut = (auth: Auth): void => {
   logout(auth);
-  removeCookies(token);
+  removeCookies(process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string);
 };
 
 export const getSessionUser = async (
   auth: AuthServer,
   { req, res }: { req: any; res: any }
 ): Promise<DecodedIdToken | null | undefined> => {
-  if (!checkCookies(token, { req, res })) return;
+  if (
+    !checkCookies(process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string, {
+      req,
+      res,
+    })
+  )
+    return;
 
-  const cookie = getCookie(token, { req, res }) as string;
+  const cookie = getCookie(process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string, {
+    req,
+    res,
+  }) as string;
 
   const user = await auth
     .verifyIdToken(cookie)

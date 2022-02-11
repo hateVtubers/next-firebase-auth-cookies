@@ -9,7 +9,7 @@ import { Auth, onAuthStateChanged, User } from "firebase/auth";
 import { setCookies, removeCookies } from "cookies-next";
 
 // @ts-ignore
-const AuthContext = createContext<{ user: User | null }>();
+const AuthContext = createContext<{ user: User | null | undefined }>();
 
 export const AuthProvider = ({
   children,
@@ -18,7 +18,7 @@ export const AuthProvider = ({
   children: ReactNode;
   auth: Auth;
 }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null | undefined>(undefined);
 
   useEffect(() => {
     const listener = onAuthStateChanged(auth, async (user) => {
