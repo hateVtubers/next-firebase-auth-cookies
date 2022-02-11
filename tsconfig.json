@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "es6",
     "module": "commonjs",
+    "lib": ["dom", "es6"],
     "declaration": true,
-    "outDir": "./lib",
+    "outDir": "./build",
     "rootDir": "./src",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "jsx": "preserve"
+    "jsx": "react",
+    "removeComments": true,
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", "lib"]
+  "exclude": ["node_modules", "build"]
 }
