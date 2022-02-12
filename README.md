@@ -1,175 +1,152 @@
 # Firebase auth with cookies
 
-## Installation
+## Install
 
 ```bash
-npm i next-firebase-auth-cookies
+npm i next-firebase-auth-cookies@latest
+
+npm i next-firebase-auth-cookies@latest firebase firebase-admin
 ```
 
 ## Configuration
 
 Create a `.env.local` in your root project directory, this will be cookie name.
 
-```js
+```ts
 // .env.local
-NEXT_PUBLIC_COOKIE_NAME = "demo";
+NEXT_PUBLIC_FIREBASE_TOKEN = "token";
+```
+
+## Requiered
+
+We need firebase client and server auth
+
+```js
+// firebase client
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { signIn } from "next-firebase-auth-cookies";
+
+const firebaseConfig = {
+  apiKey: "your firebase config",
+  authDomain: "your firebase config",
+  projectId: "your firebase config",
+  storageBucket: "your firebase config",
+  messagingSenderId: "your firebase config",
+  appId: "your firebase config",
+};
+
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+```
+
+```js
+// firebase server
+import { initializeApp, cert, getApps, getApp } from "firebase-admin/app";
+import { firebaseConfig } from "auth/firebase"; // this is json from firebase admin
+import { getAuth } from "firebase-admin/auth";
+
+const app = getApps().length
+  ? getApp()
+  : initializeApp({
+      credential: cert(firebaseConfig), // firebase admin json
+    });
+
+export const auth = getAuth(app);
 ```
 
 ## Usage
 
-create a page `demo`, `signin` function create a cookie with firebase data login.
-
-```tsx
-// /page/demo
-import { app } from "../firebase.config.js"; // your firebase config
-import {
-  getAuth,
-  GithubAuthProvider,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-
-import { signIn } from "next-firebase-auth-cookies";
-
-const auth = getAuth(app);
-
-const Demo = () => {
-  const handlerLogin = () => {
-    signInWithPopup(auth, new GoogleAuthProvider())
-      .then(signIn)
-      .catch((error) => console.log(error));
-  };
-
-  return <button onClick={handlerLogin}>login with google</button>;
-};
-
-export default Demo;
-```
-
-now create an endpoint `pages/api/auth/login` or `pages/api/auth/[...auth]`, this endpoint will return a cookie value.
-
-```ts
-// /pages/api/login
-import { getAuthCookieApi } from "firebase-auth-with-cookies";
-
-const login = (req, res) => {
-  getAuthCookieApi({ req, res }, { user: null }); // third is optional
-};
-
-export default handler;
-```
-
-`getAuthCookieApi` and `getAuthCookieApi`, receive as three parameters: `error`, this parameter is the response of the endpoint when user is not `login`.
+`signIn` create a cookie with tokenId and `signOut` remove cookie
 
 ```js
-{
-  "message": "Unauthorized"; // this is the default response, when cookie not exist
-}
-```
+// auth is getAuth(app) from client
+import { signIn, signOut } from "next-firebase-auth-cookies";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
-but if user is logged, the response will be.
+export const handleLogin = () => {
+  signInWithPopup(auth, new GoogleAuthProvider()); // client
+  then(signIn).catch(() => {});
+};
 
-```ts
-type User = { // this is value from cookie
-  displayName: string;
-  emailVerified: boolean;
-  isAnonymous: boolean;
-  photoURL: string | null;
-  providerData: UserInfo[];
-  uid: string;
+export const handleLogOut = () => {
+  signOut(auth); // client
 };
 ```
 
-Now we need an observer to listen the `login` of the user, I recommend to use `useSWR` to listen the `signIn` and `signOut` events.
+cheack session on server with `getSessionUser`
 
-```bash
-npm i swr
+```js
+import { getSessionUser } from "next-firebase-auth-cookies";
+
+export const getServerSideProps = async ({ req, res }) => {
+  const userSessionState = await getSessionUser(auth, { req, res }); // auth from firebase admin
+
+  return {
+    props: {
+      userSessionState: userSessionState ?? null,
+    },
+  };
+};
 ```
 
-```jsx
-// /page/demo
-import { app } from "../firebase.config.js"; // your firebase config
-import {
-  getAuth,
-  GithubAuthProvider,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-import useSWR from "swr";
+Why optional chaining? `getSessionUser` returns
 
-import { signIn, signOut } from "next-firebase-auth-cookies";
+- when cookie does not exist return `undefined`
+- when cookie exist but is incorret return `null`
+- when cookie exist and is corrext return `DecodedIdToken` firebease admin user
 
-const auth = getAuth(app);
-const fetcher = (args) => fetch(args).then((res) => res.json());
+## Get User without ssr
 
-const Demo = () => {
-  const { data, errorm mutate } = useSWR("/api/auth/login", fetcher);
-  const handlerLogin = () => {
-    signInWithPopup(auth, new GoogleAuthProvider())
-      .then(signIn)
-      .catch((error) => console.log(error));
-  };
-  const hanlderLogout = () => {
-    signOut(auth); // signOut remove the cookie
-    mutate(); // mutation page, to update the data user
-  };
+```js
+const { user } = useAuth({ auth }); // auth client
+```
 
-  if (error) return <div>failed to load</div>;
-  if (!data) return <div>loading...</div>;
+this hook create a listener with user logIn or logOut
 
+- first value is `undefined` you change this value
+- user not logged `null`
+- user is logged `User` firebase client
+
+you change the default value from hook
+
+```tsx
+import type { GetServerSideProps, NextPage } from "next";
+import { getSessionUser } from "next-firebase-auth-cookies";
+
+type Props = {
+  userSessionState: DecodedIdToken | null;
+};
+
+const Home: NextPage<Props> = ({ userSessionState }) => {
+  const { user } = useAuth({ auth, userSSR: userSessionState });
   return (
     <div>
-      <h1>
-        {
-          data.?uid ?
-          `you're loged as ${data?.displayName}` :
-          "you're not loged please loged"
-        }
-      </h1>
-      <button onClick={handlerLogin}>
-        login with google
-      </button>
-      <button onClick={hanlderLogout}>logout</button>
+      {user?.uid ? (
+        <h1>{"Hi you're loged"}</h1>
+      ) : (
+        <h1>{"Hi you're not loged"}</h1>
+      )}
     </div>
   );
 };
 
-export default Demo;
-```
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const userSessionState = await getSessionUser(auth, { req, res }); // auth from firebase admin
 
-if use typescript you can use `User` as `generics` for `useSWR`
-
-```tsx
-// /page/demo
-import { User } from "firebase-auth-with-cookies";
-
-const Demo = () => {
-  const { data, error } = useSWR<User>("/api/auth/login", fetcher);
-  ...
-}
-```
-
-you too can use `getServerSideProps` with `getAuthCookieProps` to get the cookie value as props
-
-```js
-// /page/demo
-export const getServerSideProps = ({ req, res }) => {
-  const cookieValue = getAuthCookieProps({ req, res }, { // this data not required loaders, but no mutation data when user is logout or login
-    user: "not logged or error uwu",
-  }); // too resive the parameterm
   return {
     props: {
-      cookieValue
+      userSessionState: userSessionState ?? null,
     },
   };
 };
 
-export default Demo;
+export default Home;
 ```
 
 ## Example
 
-### view an example
+View an example
 
 - [github repository](https://github.com/hateVtubers/demo)
 - [website](https://demo-jade-xi.vercel.app/)
