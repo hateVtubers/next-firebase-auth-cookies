@@ -1,29 +1,18 @@
-import { Auth, signOut as logout, UserCredential } from "firebase/auth";
+import {
+  Auth,
+  onAuthStateChanged,
+  signOut as logout,
+  User,
+  UserCredential,
+} from "firebase/auth";
+import React, { useEffect, useState } from "react";
 import {
   setCookies,
   removeCookies,
   checkCookies,
   getCookie,
 } from "cookies-next";
-import { Auth as AuthServer } from "firebase-admin/auth";
-
-export type User = {
-  displayName: string;
-  email: string | undefined;
-  emailVerified: boolean;
-  photoURL: string | undefined;
-  uid: string;
-  providerData: {
-    displayName: string;
-    email: string | undefined;
-    photoURL: string | undefined;
-    providerId: string;
-    uid: string;
-    identities: {
-      [key: string]: any;
-    };
-  };
-} | null | undefined;
+import { Auth as AuthServer, DecodedIdToken } from "firebase-admin/auth";
 
 export const signIn = async ({ user }: UserCredential) => {
   setCookies(
@@ -41,7 +30,7 @@ export const signOut = (auth: Auth): void => {
 export const getSessionUser = async (
   auth: AuthServer,
   { req, res }: { req: any; res: any }
-): Promise<User> => {
+): Promise<DecodedIdToken | null | undefined> => {
   if (
     !checkCookies(process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string, {
       req,
@@ -57,31 +46,41 @@ export const getSessionUser = async (
 
   const user = await auth
     .verifyIdToken(cookie)
-    .then(
-      ({
-        name,
-        email,
-        emailVerified,
-        picture,
-        user_id,
-        firebase: { sign_in_provider, identities },
-      }) => ({
-        displayName: name as string,
-        email,
-        emailVerified: emailVerified as boolean,
-        photoURL: picture,
-        uid: user_id as string,
-        providerData: {
-          displayName: name as string,
-          email,
-          photoURL: picture,
-          providerId: sign_in_provider,
-          uid: user_id as string,
-          identities,
-        },
-      })
-    )
+    .then((value) => value)
     .catch(() => null);
 
   return user;
+};
+
+type Props = {
+  auth: Auth;
+  userSSR?: DecodedIdToken;
+};
+
+export const useAuth = ({ auth, userSSR }: Props) => {
+  const [user, setUser] = useState<null | undefined | DecodedIdToken | User>(
+    userSSR
+  );
+
+  useEffect(() => {
+    const listener = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setUser(user);
+        removeCookies(process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string);
+        return;
+      }
+
+      setCookies(
+        process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string,
+        await user.getIdToken()
+      );
+      setUser(user);
+    });
+
+    return () => {
+      listener();
+    };
+  }, []);
+
+  return { user };
 };
