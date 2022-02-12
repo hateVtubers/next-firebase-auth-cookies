@@ -54,7 +54,7 @@ export const getSessionUser = async (
 
 type Props = {
   auth: Auth;
-  userSSR?: DecodedIdToken;
+  userSSR?: DecodedIdToken | null;
 };
 
 export const useAuth = ({ auth, userSSR }: Props) => {
