@@ -4,15 +4,15 @@ import {
   signOut as logout,
   User,
   UserCredential,
-} from "firebase/auth";
-import React, { useEffect, useState } from "react";
+} from 'firebase/auth';
+import React, { useEffect, useState } from 'react';
 import {
   setCookies,
   removeCookies,
   checkCookies,
   getCookie,
-} from "cookies-next";
-import { Auth as AuthServer, DecodedIdToken } from "firebase-admin/auth";
+} from 'cookies-next';
+import { Auth as AuthServer, DecodedIdToken } from 'firebase-admin/auth';
 
 export const signIn = async ({ user }: UserCredential) => {
   setCookies(
@@ -22,8 +22,8 @@ export const signIn = async ({ user }: UserCredential) => {
   return user;
 };
 
-export const signOut = (auth: Auth): void => {
-  logout(auth);
+export const signOut = async (auth: Auth) => {
+  await logout(auth);
   removeCookies(process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string);
 };
 
