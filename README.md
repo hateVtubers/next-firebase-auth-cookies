@@ -116,6 +116,8 @@ this user is valid only client side
 const { user, loading } = useAuth({ auth }); // firebase auth client
 ```
 
+## Get User with ssr
+
 this hook create a listener with user logIn or logOut
 by default the value is `undefined` you can change this value
 
