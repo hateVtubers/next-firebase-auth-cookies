@@ -1,6 +1,6 @@
 {
   "name": "next-firebase-auth-cookies",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "firebase auth based in cookies",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -13,9 +13,6 @@
   },
   "repository": "@github.com:hateVtubers/next-firebase-auth-cookies.git",
   "keywords": [
-    "js",
-    "cookies",
-    "cookie",
     "next",
     "nextjs",
     "auth",

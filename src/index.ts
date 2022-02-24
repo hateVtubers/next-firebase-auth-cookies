@@ -1,10 +1,4 @@
-import {
-  Auth,
-  onAuthStateChanged,
-  signOut as logout,
-  User,
-  UserCredential,
-} from 'firebase/auth';
+import { Auth, onAuthStateChanged } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import {
   setCookies,
@@ -12,69 +6,73 @@ import {
   checkCookies,
   getCookie,
 } from 'cookies-next';
-import { Auth as AuthServer, DecodedIdToken } from 'firebase-admin/auth';
+import { Auth as AuthServer } from 'firebase-admin/auth';
+import { User, UserState } from './types';
 
-export const signIn = async ({ user }: UserCredential) => {
-  setCookies(
-    process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string,
-    await user.getIdToken()
-  );
-  return user;
+const tokenName = process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string;
+
+type Props = {
+  auth: Auth;
+  userSSR?: User;
 };
 
-export const signOut = async (auth: Auth) => {
-  await logout(auth);
-  removeCookies(process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string);
-};
-
-export const getSessionUser = async (
+export const userSessionState = async (
   auth: AuthServer,
   { req, res }: { req: any; res: any }
-): Promise<DecodedIdToken | null | undefined> => {
-  if (
-    !checkCookies(process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string, {
-      req,
-      res,
-    })
-  )
-    return;
+) => {
+  if (!checkCookies(tokenName, { req, res }))
+    return { user: null, error: 'token does not exits' };
 
-  const cookie = getCookie(process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string, {
+  const cookie = getCookie(tokenName, {
     req,
     res,
   }) as string;
 
-  const user = await auth
+  const user: User = await auth
     .verifyIdToken(cookie)
-    .then((value) => value)
-    .catch(() => null);
+    .then((value) => ({
+      user: {
+        displayName: value.name,
+        email: value.email,
+        emailVerified: value.email_verified,
+        photoURL: value.picture,
+        phoneNumber: value.phone_number,
+        providerId: 'firebase',
+        uid: value.uid,
+        providerData: [
+          {
+            displayName: value.name,
+            email: value.email,
+            photoURL: value.picture,
+            phoneNumber: value.phone_number,
+            providerId: value.firebase.sign_in_provider,
+            uid: value.uid,
+          },
+        ],
+      },
+      error: null,
+    }))
+    .catch(() => ({ user: null, error: 'token is invalid' }));
 
   return user;
 };
 
-type Props = {
-  auth: Auth;
-  userSSR?: DecodedIdToken | null;
-};
-
 export const useAuth = ({ auth, userSSR }: Props) => {
-  const [user, setUser] = useState<null | undefined | DecodedIdToken | User>(
-    userSSR
-  );
+  const [userState, setUserState] = useState<UserState>({
+    loading: userSSR ? false : true,
+    user: userSSR,
+  });
 
   useEffect(() => {
     const listener = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        setUser(user);
-        removeCookies(process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string);
+        setUserState({ loading: false, user });
+        removeCookies(tokenName);
         return;
       }
 
-      setCookies(
-        process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string,
-        await user.getIdToken()
-      );
-      setUser(user);
+      setCookies(tokenName, await user.getIdToken());
+      setUserState({ loading: false, user });
     });
 
     return () => {
@@ -82,5 +80,5 @@ export const useAuth = ({ auth, userSSR }: Props) => {
     };
   }, []);
 
-  return { user };
+  return { user: userState };
 };
