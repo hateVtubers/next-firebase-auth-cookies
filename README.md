@@ -118,7 +118,7 @@ const { user, loading } = useAuth({ auth }); // firebase auth client
 
 ## Get User with ssr
 
-this hook create a listener with user logIn or logOut
+this hook create a listener for logIn or logOut
 by default the value is `undefined` you can change this value
 
 ```jsx
