@@ -7,7 +7,8 @@ import {
   getCookie,
 } from 'cookies-next';
 import { Auth as AuthServer } from 'firebase-admin/auth';
-import { User, UserState } from './types';
+import { User, UserClient, UserState } from './types';
+import { User as FirebaseUser } from 'firebase/auth';
 
 const tokenName = process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string;
 
@@ -58,21 +59,22 @@ export const userSessionState = async (
 };
 
 export const useAuth = ({ auth, userSSR }: Props) => {
-  const [userState, setUserState] = useState<UserState>({
+  const [user, setUser] = useState<UserState>({
     loading: userSSR ? false : true,
-    user: userSSR,
+    user: (userSSR?.user as UserClient) ?? null,
   });
 
   useEffect(() => {
-    const listener = onAuthStateChanged(auth, async (user) => {
+    const listener = onAuthStateChanged(auth, async (value) => {
       if (!user) {
-        setUserState({ loading: false, user });
+        setUser({ loading: false, user: value as UserClient });
         removeCookies(tokenName);
+
         return;
       }
 
-      setCookies(tokenName, await user.getIdToken());
-      setUserState({ loading: false, user });
+      setCookies(tokenName, await value?.getIdToken());
+      setUser({ loading: false, user: value as UserClient });
     });
 
     return () => {
@@ -80,5 +82,5 @@ export const useAuth = ({ auth, userSSR }: Props) => {
     };
   }, []);
 
-  return { user: userState };
+  return { ...user };
 };

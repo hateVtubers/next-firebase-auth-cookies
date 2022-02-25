@@ -1,15 +1,15 @@
 {
   "name": "next-firebase-auth-cookies",
-  "version": "3.0.7",
+  "version": "3.0.8",
   "description": "firebase auth based in cookies",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "files": [
-    "build/**"
+    "lib/**"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc -p ."
+    "build": "npx tsc"
   },
   "repository": "@github.com:hateVtubers/next-firebase-auth-cookies.git",
   "keywords": [

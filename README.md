@@ -180,15 +180,29 @@ export type User = {
 User value in client
 
 ```ts
-export type UserState = {
-  loading: boolean;
-  user: null | undefined | User | FirebaseUser;
-};
+export type UserClient = {
+  displayName: string;
+  email?: string;
+  emailVerified?: boolean;
+  photoURL?: string;
+  phoneNumber?: string;
+  providerId: string;
+  uid: string;
+  providerData: {
+    displayName: any;
+    email?: string;
+    photoURL?: string;
+    phoneNumber?: string;
+    providerId: string;
+    uid: string;
+  }[];
+} & FirebaseUser;
 ```
 
 import types
+
 ```ts
-import type { UserState, User } from 'next-firebase-auth-cookies/types';
+import type { User, UserClient } from 'next-firebase-auth-cookies/types';
 ```
 
 ## Example
