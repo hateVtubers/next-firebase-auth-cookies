@@ -63,3 +63,7 @@ typings/
 
 package-lock.json
 /build
+/auth
+/types
+index.js
+index.d.ts
