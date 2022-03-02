@@ -155,54 +155,35 @@ export default Home;
 User value in server
 
 ```ts
-export type User = {
-  user: null | {
-    displayName: string;
-    email?: string;
-    emailVerified?: boolean;
-    photoURL?: string;
-    phoneNumber?: string;
-    providerId: string;
-    uid: string;
-    providerData: {
-      displayName: any;
-      email?: string;
-      photoURL?: string;
-      phoneNumber?: string;
-      providerId: string;
-      uid: string;
-    }[];
-  };
-  error: string | null;
-};
-```
-
-User value in client
-
-```ts
-export type UserClient = {
+export type UserServer = null | {
   displayName: string;
-  email?: string;
-  emailVerified?: boolean;
-  photoURL?: string;
-  phoneNumber?: string;
+  email: string | null;
+  emailVerified: boolean | null;
+  photoURL: string | null;
+  phoneNumber: string | null;
   providerId: string;
   uid: string;
   providerData: {
     displayName: any;
-    email?: string;
-    photoURL?: string;
-    phoneNumber?: string;
+    email: string | null;
+    photoURL: string | null;
+    phoneNumber: string | null;
     providerId: string;
     uid: string;
   }[];
-} & FirebaseUser;
+};
+```
+
+User value in client with `useAuth`
+
+```ts
+export type UserClient = (UserServer & User) | null; // type User is from firebase
 ```
 
 import types
 
 ```ts
-import type { User, UserClient } from 'next-firebase-auth-cookies/types';
+import type { UserServer, UserClient } from 'next-firebase-auth-cookies/types';
 ```
 
 ## Example

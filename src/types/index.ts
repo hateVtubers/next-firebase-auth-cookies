@@ -1,45 +1,26 @@
-import { User as FirebaseUser } from 'firebase/auth';
+import { User } from 'firebase/auth';
 
-export type User = {
-  user: null | {
-    displayName: string;
-    email?: string;
-    emailVerified?: boolean;
-    photoURL?: string;
-    phoneNumber?: string;
-    providerId: string;
-    uid: string;
-    providerData: {
-      displayName: any;
-      email?: string;
-      photoURL?: string;
-      phoneNumber?: string;
-      providerId: string;
-      uid: string;
-    }[];
-  };
-  error: string | null;
-};
-
-export type UserClient = {
+export type UserServer = null | {
   displayName: string;
-  email?: string;
-  emailVerified?: boolean;
-  photoURL?: string;
-  phoneNumber?: string;
+  email: string | null;
+  emailVerified: boolean | null;
+  photoURL: string | null;
+  phoneNumber: string | null;
   providerId: string;
   uid: string;
   providerData: {
     displayName: any;
-    email?: string;
-    photoURL?: string;
-    phoneNumber?: string;
+    email: string | null;
+    photoURL: string | null;
+    phoneNumber: string | null;
     providerId: string;
     uid: string;
   }[];
-} & FirebaseUser;
+};
+
+export type UserClient = (UserServer & User) | null;
 
 export type UserState = {
   loading: boolean;
-  user: UserClient | null;
+  user: UserClient;
 };

@@ -1,8 +1,7 @@
 {
   "name": "next-firebase-auth-cookies",
-  "version": "3.0.8",
+  "version": "3.1.2",
   "description": "firebase auth based in cookies",
-  "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "lib/**"

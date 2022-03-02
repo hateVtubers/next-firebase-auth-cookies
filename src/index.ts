@@ -7,20 +7,24 @@ import {
   getCookie,
 } from 'cookies-next';
 import { Auth as AuthServer } from 'firebase-admin/auth';
-import { User, UserClient, UserState } from './types';
-import { User as FirebaseUser } from 'firebase/auth';
+import { UserServer, UserClient, UserState } from './types';
 
 const tokenName = process.env.NEXT_PUBLIC_FIREBASE_TOKEN as string;
 
 type Props = {
   auth: Auth;
-  userSSR?: User;
+  userSSR?: UserServer;
 };
+
+type UserSessionState = Promise<{
+  user: null | UserServer;
+  error: null | string;
+}>;
 
 export const userSessionState = async (
   auth: AuthServer,
   { req, res }: { req: any; res: any }
-) => {
+): UserSessionState => {
   if (!checkCookies(tokenName, { req, res }))
     return { user: null, error: 'token does not exits' };
 
@@ -29,23 +33,23 @@ export const userSessionState = async (
     res,
   }) as string;
 
-  const user: User = await auth
+  const user = await auth
     .verifyIdToken(cookie)
     .then((value) => ({
       user: {
         displayName: value.name,
-        email: value.email,
-        emailVerified: value.email_verified,
-        photoURL: value.picture,
-        phoneNumber: value.phone_number,
+        email: value.email ?? null,
+        emailVerified: value.email_verified ?? null,
+        photoURL: value.picture ?? null,
+        phoneNumber: value.phone_number ?? null,
         providerId: 'firebase',
         uid: value.uid,
         providerData: [
           {
             displayName: value.name,
-            email: value.email,
-            photoURL: value.picture,
-            phoneNumber: value.phone_number,
+            email: value.email ?? null,
+            photoURL: value.picture ?? null,
+            phoneNumber: value.phone_number ?? null,
             providerId: value.firebase.sign_in_provider,
             uid: value.uid,
           },
@@ -61,7 +65,7 @@ export const userSessionState = async (
 export const useAuth = ({ auth, userSSR }: Props) => {
   const [user, setUser] = useState<UserState>({
     loading: userSSR ? false : true,
-    user: (userSSR?.user as UserClient) ?? null,
+    user: (userSSR as UserClient) ?? null,
   });
 
   useEffect(() => {
